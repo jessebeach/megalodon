@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Megalodon : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/pygment_trac.css">
+
+    <title>Megalodon</title>
+  </head>
+
+  <body>
+
+
+<div id="header_wrap" class="outer">
+  <header class="inner">
+  <a id="forkme_banner" href="https://github.com/msonnabaum/megalodon">View on GitHub</a>
+  <h1 id="project_title">Megalodon</h1>
+  <h2 id="project_tagline"></h2>
+
+  </header>
+</div>
+  <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      <p>The goal of megalodon to provide a simple, repeatable, and extendable way to setup a modern php development environment on Mac OS X. It consists of a collection of <a href='http://mxcl.github.com/homebrew'>homebrew</a> formulas and <a href='http://www.opscode.com/chef/'>chef</a> recipies. It&#8217;s pretty awesome.</p>
+
+<p>This project is heavily influenced by <a href='https://github.com/atmos/cinderella'>cider/cinderella</a>, which is aimed at providing an environment for ruby/python/node. Megalodon started as a fork of <a href='https://github.com/atmos/smeagol'>smeagol</a> (the chef bits of cinderella), but has since taken a different approach.</p>
+
+<h2 id='installation'>Installation</h2>
+
+<p>Install <a href='http://mxcl.github.com/homebrew/'>homebrew</a>.</p>
+
+<p>Install megalodon:</p>
+
+<pre><code>brew install https://raw.github.com/msonnabaum/megalodon/master/formulas/megalodon.rb</code></pre>
+
+<p>Run megalodon:</p>
+
+<pre><code>megalodon install</code></pre>
+
+<h2 id='upgrading_to_os_x_mountain_lion'>Upgrading to OS X Mountain Lion</h2>
+
+<p>After the upgrade finishes, do the following to get homebrew and megalodon working again:</p>
+
+<ol>
+<li>Install the latest command line tools for xcode from <a href='https://developer.apple.com/'>developer.apple.com</a></li>
+
+<li>Install <a href='http://xquartz.macosforge.org/landing/'>x11</a></li>
+
+<li>Update megalodon and re-run:</li>
+</ol>
+<div class='highlight'><pre><code class='sh'>brew uninstall megalodon
+brew uninstall php
+brew install https://raw.github.com/msonnabaum/megalodon/master/formulas/megalodon.rb --HEAD
+megalodon install
+</code></pre>
+</div>
+<h2 id='usage'>Usage</h2>
+
+<h3 id='general'>General</h3>
+
+<p>Megalodon uses OSX&#8217;s built in apache, so you can restart apache like so:</p>
+
+<pre><code>sudo /usr/sbin/apachectl restart</code></pre>
+
+<p>Everything else that&#8217;s installed with homebrew should have a plist in ~/Library/LaunchAgents (OSX&#8217;s equivalent to /etc/init.d), which can be managed with lunchy. It will soon be included in megalodon, but for now just do <code>gem install lunchy</code>.</p>
+
+<p>For example, you&#8217;d restart mysql like so:</p>
+
+<pre><code>lunchy restart mysql</code></pre>
+
+<h3 id='managing_virtual_hosts'>Managing virtual hosts</h3>
+
+<p>You will need to edit /etc/hosts as per usual; To add a new virtual host, add a new .json file in:</p>
+
+<pre><code>~/.megalodon/data_bags/vhosts</code></pre>
+
+<p>To re-generate the apache confs after modifying/adding vhosts:</p>
+
+<pre><code>megalodon update_vhosts</code></pre>
+
+<p>Then restart apache as above.</p>
+
+<h2 id='other_notes'>Other notes</h2>
+
+<p>mysql default username is root, no password</p>
+    </section>
+    </div>
+   <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Megalodon maintained by <a href="https://github.com/msonnabaum">msonnabaum</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-33670586-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
