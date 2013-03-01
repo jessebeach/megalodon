@@ -2,7 +2,6 @@
 # Cookbook Name:: megalodon
 # Recipe:: default
 #
-require 'highline/import'
 
 directory "#{ENV['HOME']}/.megalodon" do
   action :create

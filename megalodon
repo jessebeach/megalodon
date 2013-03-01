@@ -1,53 +1,68 @@
 #!/usr/bin/env ruby
+require "rubygems"
+require 'optparse'
+require 'fileutils'
 
-begin
-  require "rubygems"
-  require 'chef'
-  require 'highline/import'
-  require 'optparse'
-  require 'fileutils'
-
-  opt_parser = OptionParser.new do |opt|
-    opt.banner = "Usage: megalodon {-h} [install|update_vhosts]"
-    opt.on("-h","--help","help") do
-      puts opt_parser
-      exit
-    end
+# Cross-platform way of finding an executable in the $PATH. (stolen from hub)
+#
+#   which('ruby') #=> /usr/bin/ruby
+def which(cmd)
+  exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+  ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+    exts.each { |ext|
+      exe = "#{path}/#{cmd}#{ext}"
+      return exe if File.executable? exe
+    }
   end
-
-  # Parse the command line.
-  opt_parser.parse!
-
-  case ARGV[0]
-    when 'update_vhosts'
-      runlist = 'run_vhosts.json'
-    when 'install', nil
-      runlist = 'run_list.json'
-    else
-      puts opt_parser
-      exit
-  end
-
-  # Create the databag directory here since it appears that the chef-solo run
-  # will fail if it doesn't already exist. Wish there was a better way to do this…
-  directory_name = "#{ENV['HOME']}/.megalodon/data_bags/vhosts"
-  FileUtils.mkdir_p(directory_name) unless FileTest::directory?(directory_name)
-
-  cwd = Dir.pwd
-  gem_path = `gem env| grep "EXECUTABLE DIRECTORY"| awk -F': ' '{print $2}'`.strip
-  unless File.exists?("#{gem_path}/chef-solo")
-    raise "Cannot find chef-solo at #{gem_path}/chef-solo}"
-  end
-
-  puts "Copying custom forumulas"
-  system("cp #{cwd}/formulas/* /usr/local/Library/Formula/")
-  puts "Starting chef-solo run"
-  system("#{gem_path}/chef-solo -j #{cwd}/config/#{runlist} -c #{cwd}/config/solo.rb")
-
-rescue LoadError => e
-  puts e.message
-  puts "You don't seem to have chef, installing it for you"
-  sudo = File.writable?(%x[gem environment| grep "INSTALLATION DIRECTORY"| awk -F':' '{print $2}'].strip) ? "" : "sudo "
-  system("#{sudo} gem install chef --no-rdoc --no-ri")
-  puts "I had to install chef for you, please rerun 'megalodon install'"
+  return nil
 end
+
+def install_chef
+  puts "You don't seem to have chef, installing it for you"
+  script_name = "install.sh"
+  command = [
+    "curl -L -o /tmp/#{script_name} https://www.opscode.com/chef/#{script_name}",
+    "sudo bash /tmp/#{script_name} -v 10.24.0"
+  ]
+  system command.join(" && ")
+  which('chef-solo')
+end
+
+opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: megalodon {-h} [install|update_vhosts]"
+  opt.on("-h","--help","help") do
+    puts opt_parser
+    exit
+  end
+end
+
+# Parse the command line.
+opt_parser.parse!
+
+case ARGV[0]
+  when 'update_vhosts'
+    runlist = 'run_vhosts.json'
+  when 'install', nil
+    runlist = 'run_list.json'
+  else
+    puts opt_parser
+    exit
+end
+
+# Create the databag directory here since it appears that the chef-solo run
+# will fail if it doesn't already exist. Wish there was a better way to do this…
+directory_name = "#{ENV['HOME']}/.megalodon/data_bags/vhosts"
+FileUtils.mkdir_p(directory_name) unless FileTest::directory?(directory_name)
+
+cwd = Dir.pwd
+
+chef_solo = which('chef-solo') || install_chef
+
+unless chef_solo
+  raise "Cannot find chef-solo!}"
+end
+
+puts "Copying custom forumulas"
+system("cp #{cwd}/formulas/* /usr/local/Library/Formula/")
+puts "Starting chef-solo run"
+system("#{chef_solo} -j #{cwd}/config/#{runlist} -c #{cwd}/config/solo.rb")
