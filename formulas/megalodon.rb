@@ -14,15 +14,14 @@ end
 
 __END__
 diff --git a/megalodon b/megalodon
-index 61615e5..27020a7 100755
+index f04db01..da7d117 100755
 --- a/megalodon
 +++ b/megalodon
-@@ -4,7 +4,7 @@ begin
-   require "rubygems"
-   require 'chef'
- 
--  cwd = Dir.pwd
-+  cwd = `brew --prefix megalodon`.strip
-   gem_path = `gem env| grep "EXECUTABLE DIRECTORY"| awk -F': ' '{print $2}'`.strip
-   unless File.exists?("#{gem_path}/chef-solo")
-     raise "Cannot find chef-solo at #{gem_path}/chef-solo}"
+@@ -54,7 +54,7 @@ end
+ directory_name = "#{ENV['HOME']}/.megalodon/data_bags/vhosts"
+ FileUtils.mkdir_p(directory_name) unless FileTest::directory?(directory_name)
+
+-cwd = Dir.pwd
++cwd = `brew --prefix megalodon`.strip
+
+ chef_solo = which('chef-solo') || install_chef
