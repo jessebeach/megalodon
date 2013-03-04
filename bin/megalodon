@@ -54,7 +54,7 @@ end
 directory_name = "#{ENV['HOME']}/.megalodon/data_bags/vhosts"
 FileUtils.mkdir_p(directory_name) unless FileTest::directory?(directory_name)
 
-cwd = Dir.pwd
+megalodon_path = File.expand_path("../../", __FILE__)
 
 chef_solo = which('chef-solo') || install_chef
 
@@ -63,6 +63,6 @@ unless chef_solo
 end
 
 puts "Copying custom forumulas"
-system("cp #{cwd}/formulas/* /usr/local/Library/Formula/")
+system("cp #{megalodon_path}/formulas/* /usr/local/Library/Formula/")
 puts "Starting chef-solo run"
-system("#{chef_solo} -j #{cwd}/config/#{runlist} -c #{cwd}/config/solo.rb")
+system("#{chef_solo} -j #{megalodon_path}/config/#{runlist} -c #{megalodon_path}/config/solo.rb")
