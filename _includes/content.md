@@ -8,7 +8,7 @@ Install [homebrew](http://mxcl.github.com/homebrew/).
 
 Install megalodon:
 
-    brew install https://raw.github.com/msonnabaum/megalodon/master/formulas/megalodon.rb
+    gem install megalodon
 
 Run megalodon:
 
@@ -23,9 +23,9 @@ After the upgrade finishes, do the following to get homebrew and megalodon worki
 3. Update megalodon and re-run:
 
 {% highlight sh %}
-brew uninstall megalodon
+gem uninstall megalodon
 brew uninstall php
-brew install https://raw.github.com/msonnabaum/megalodon/master/formulas/megalodon.rb --HEAD
+gem install megalodon
 megalodon install
 {% endhighlight %}
 
