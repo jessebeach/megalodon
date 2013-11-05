@@ -2,7 +2,7 @@
 # Author:: Joshua Timberman (<jtimberman@opscode.com>)
 # Author:: Graeme Mathieson (<mathie@woss.name>)
 # Cookbook Name:: homebrew
-# Recipes:: default
+# Libraries:: homebrew_mixin
 #
 # Copyright 2011-2013, Opscode, Inc.
 #
@@ -19,28 +19,35 @@
 # limitations under the License.
 #
 
-self.extend(Homebrew::Mixin)
+module Homebrew
+  module Mixin
 
-homebrew_go = "#{Chef::Config[:file_cache_path]}/homebrew_go"
-owner = homebrew_owner
+    def homebrew_owner
+      @homebrew_owner ||= calculate_owner
+    end
 
-Chef::Log.debug("Homebrew owner is '#{homebrew_owner}'")
+    private
 
-remote_file homebrew_go do
-  source "https://raw.github.com/mxcl/homebrew/go"
-  mode 00755
-end
+    def calculate_owner
+      owner = homebrew_owner_attr || sudo_user || current_user
+      if owner == "root"
+        raise Chef::Exceptions::User,
+          "Homebrew owner is 'root' which is not supported. " +
+          "To set an explicit owner, please set node['homebrew']['owner']."
+      end
+      owner
+    end
 
-execute homebrew_go do
-  user owner
-  not_if { ::File.exist? '/usr/local/bin/brew' }
-end
+    def homebrew_owner_attr
+      node['homebrew']['owner']
+    end
 
-package 'git' do
-  not_if "which git"
-end
+    def sudo_user
+      ENV['SUDO_USER']
+    end
 
-execute "update homebrew from github" do
-  user owner
-  command "/usr/local/bin/brew update || true"
+    def current_user
+      ENV['USER']
+    end
+  end
 end

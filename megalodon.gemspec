@@ -10,5 +10,5 @@ Gem::Specification.new do |s|
   s.files             = `git ls-files`.split($\)
   s.executables       = `git ls-files bin | cut -c5-`.split($\)
 
-  s.add_dependency "chef", "~> 10.26.0"
+  s.add_dependency "chef", "~> 11.8.0"
 end

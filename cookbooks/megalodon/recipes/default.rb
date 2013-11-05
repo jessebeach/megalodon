@@ -2,6 +2,7 @@
 # Cookbook Name:: megalodon
 # Recipe:: default
 #
+include_recipe "homebrew"
 
 directory "#{ENV['HOME']}/.megalodon" do
   action :create

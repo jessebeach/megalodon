@@ -2,7 +2,7 @@
 # Author:: Joshua Timberman (<jtimberman@opscode.com>)
 # Author:: Graeme Mathieson (<mathie@woss.name>)
 # Cookbook Name:: homebrew
-# Recipes:: default
+# Providers:: tap
 #
 # Copyright 2011-2013, Opscode, Inc.
 #
@@ -19,28 +19,30 @@
 # limitations under the License.
 #
 
-self.extend(Homebrew::Mixin)
+def load_current_resource
+  @tap = Chef::Resource::HomebrewTap.new(new_resource.name)
+  tap_dir = @tap.name.gsub('/', '-')
 
-homebrew_go = "#{Chef::Config[:file_cache_path]}/homebrew_go"
-owner = homebrew_owner
-
-Chef::Log.debug("Homebrew owner is '#{homebrew_owner}'")
-
-remote_file homebrew_go do
-  source "https://raw.github.com/mxcl/homebrew/go"
-  mode 00755
+  Chef::Log.debug("Checking whether we've already tapped #{new_resource.name}")
+  if ::File.directory?("/usr/local/Library/Taps/#{tap_dir}")
+    @tap.tapped true
+  else
+    @tap.tapped false
+  end
 end
 
-execute homebrew_go do
-  user owner
-  not_if { ::File.exist? '/usr/local/bin/brew' }
+action :tap do
+  unless @tap.tapped
+    execute "tapping #{new_resource.name}" do
+      command "/usr/local/bin/brew tap #{new_resource.name}"
+    end
+  end
 end
 
-package 'git' do
-  not_if "which git"
-end
-
-execute "update homebrew from github" do
-  user owner
-  command "/usr/local/bin/brew update || true"
+action :untap do
+  if @tap.tapped
+    execute "untapping #{new_resource.name}" do
+      command "/usr/local/bin/brew untap #{new_resource.name}"
+    end
+  end
 end
