@@ -22,8 +22,16 @@ def install_chef
   script_name = "install.sh"
   command = [
     "curl -L -o /tmp/#{script_name} https://www.opscode.com/chef/#{script_name}",
-    "sudo bash /tmp/#{script_name} -v 10.24.0"
   ]
+
+  # Awful hack, but necessary until https://tickets.opscode.com/browse/CHEF-4678
+  # is resolved.
+  if %x[sw_vers -productVersion].strip == "10.9"
+    command.push "sed 's/10.8/10.9/' < /tmp/#{script_name} | sudo bash"
+  else
+    command.push "sudo bash /tmp/#{script_name}"
+  end
+
   system command.join(" && ")
   which('chef-solo')
 end
